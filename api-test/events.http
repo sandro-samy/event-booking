@@ -1,0 +1,37 @@
+@baseUrl = http://localhost:8080
+
+# Run "Create event" first — the other requests reuse the id it returns.
+@eventId = 35
+# @eventId = {{createEvent.response.body.$.event.id}}
+
+### Create event
+# @name createEvent
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": "Sample Event",
+  "description": "This is a sample event.",
+  "location": "Cairo",
+  "date_time": "2024-06-01T10:00:00Z"
+}
+
+### Get all events
+GET {{baseUrl}}/events
+
+### Get event by id
+GET {{baseUrl}}/events/{{eventId}}
+
+### Update event
+PUT {{baseUrl}}/events/{{eventId}}
+Content-Type: application/json
+
+{
+  "name": "Updated 2 Event",
+  "description": "This is an updated 2 event.",
+  "location": "Alexandria",
+  "date_time": "2025-06-01T10:00:00Z"
+}
+
+### Delete event
+DELETE {{baseUrl}}/events/{{eventId}}

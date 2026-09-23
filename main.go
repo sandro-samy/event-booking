@@ -1,21 +1,20 @@
 package main
 
 import (
-	"event-booking/models"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	DB "github.com/sandro-samy/event-booking/db"
+	"github.com/sandro-samy/event-booking/routes"
 )
 
 func main() {
+	DB.InitDB()
 	server := gin.Default()
 
-	server.GET("/", getEvents)
+	routes.RegisterRoutes(server)
 
-	server.Run(":8080") // localhost:8080
+
+
+	server.Run(":8080")
 }
 
-func getEvents(context *gin.Context) {
-	events := models.GetAllEvents()
-	context.JSON(http.StatusOK, events)
-}
+
