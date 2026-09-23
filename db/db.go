@@ -28,7 +28,7 @@ func InitDB() *sql.DB {
 func createTables() {
 	createUsersTable := `
 		CREATE TABLE IF NOT EXISTS users (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			id TEXT PRIMARY KEY,
 			email TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL
 		)
@@ -43,12 +43,12 @@ func createTables() {
 
 	createEventsTable := `
 		CREATE TABLE IF NOT EXISTS events (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
 			description TEXT NOT NULL,
 			location TEXT NOT NULL,
 			date_time DATETIME NOT NULL,
-			user_id INTEGER,
+			user_id TEXT,
 			FOREIGN KEY(user_id) REFERENCES users(id)
 		)
 	`

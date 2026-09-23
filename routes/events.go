@@ -2,7 +2,6 @@ package routes
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	events "github.com/sandro-samy/event-booking/models"
@@ -21,15 +20,7 @@ func GetEvents(c *gin.Context) {
 }
 
 func GetEventByID(c *gin.Context) {
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "valid id is required",
-			"error": err,
-		})
-	}
-
-	event, err := events.GetEventById(id)
+	event, err := events.GetEventById(c.Param("id"))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -52,7 +43,7 @@ func CreateEvent(c *gin.Context) {
 		})
 	}
 
-	event.UserID = 1 // Replace with the actual user ID from the authenticated user
+	event.UserID = "1" // Replace with the actual user ID from the authenticated user
 
 	if err := event.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -74,16 +65,7 @@ func UpdateEvent(c *gin.Context) {
 			"error": err,
 		})
 	}
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Please provide a valid ID",
-			"error": err,
-		})
-
-	}
-
-	event.ID = id
+	event.ID = c.Param("id")
 	updatedEvent, err := event.Update()
 
 	if err != nil {
@@ -100,15 +82,7 @@ func UpdateEvent(c *gin.Context) {
 }
 
 func DeleteEvent(c *gin.Context) {
-	eventID, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "valid event is required!",
-			"error": err,
-		})
-	}
-
-	err = events.Delete(eventID)
+	err := events.Delete(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to delete Event with id " + c.Param("id"),
