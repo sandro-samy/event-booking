@@ -17,23 +17,26 @@ func (user *User) Save() error {
 	query := `INSERT INTO users(email, password) VALUES (?, ?)`
 
 	stmt, err := db.DB.Prepare(query)
+
+	defer stmt.Close()
 	if err != nil {
 		return err
 	}
 
 	hashedPassword, err := utils.HashPassword(user.Password)
 
+
 	result, err := stmt.Exec(user.Email, hashedPassword)
 	if err != nil {
 		return err
 	}
 
-	userId, err := result.LastInsertId()
+	userID, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
 
-	user.ID = userId
+	user.ID = userID
 
 	return nil
 }
@@ -46,13 +49,13 @@ func (u *User) ValidateCredentials() error {
 	err := row.Scan(&u.ID, &password)
 
 	if err != nil {
-		return errors.New("Credentials invalid")
+		return errors.New("credentials invalid")
 	}
 
 	isValid := utils.CheckMatchingPassword(password, u.Password)
 
 	if !isValid {
-		return errors.New("Credentials invalid")
+		return errors.New("credentials invalid")
 	}
 
 	return nil

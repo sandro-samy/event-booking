@@ -1,10 +1,13 @@
 package routes
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sandro-samy/event-booking/models"
 	events "github.com/sandro-samy/event-booking/models"
 )
 
@@ -12,11 +15,12 @@ func GetEvents(c *gin.Context) {
 	events, err := events.GetEvents()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Could not fetch events.",
+			"message": "could not fetch events.",
 			"error":   err,
 		})
 		return
 	}
+
 	c.JSON(http.StatusOK, events)
 }
 
@@ -30,6 +34,7 @@ func GetEventByID(c *gin.Context) {
 		return
 	}
 
+	userID := c.GetInt64("userID")
 	event, err := events.GetEventById(id)
 
 	if err != nil {
@@ -40,80 +45,139 @@ func GetEventByID(c *gin.Context) {
 		return
 	}
 
+	if event.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "not authorized",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"event": event,
 	})
 }
 
 func CreateEvent(c *gin.Context) {
-
 	var event events.Event
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Could not parse request data.",
+			"message": "could not parse request data.",
 			"error":   err,
 		})
 		return
 	}
 
 	userID := c.GetInt64("userID")
-
 	event.UserID = userID // Replace with the actual user ID from the authenticated user
 
 	if err := event.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Could not create event.",
+			"message": "could not create event.",
 			"error":   err,
 		})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Event created.",
+		"message": "event created.",
 		"event":   event,
 	})
 }
 
 func UpdateEvent(c *gin.Context) {
-	var event events.Event
-	if err := c.ShouldBindJSON(&event); err != nil {
+	eventID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Could not parse request data.",
-			"error":   err,
-		})
-		return
-	}
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Please provide a valid ID",
+			"message": "please provide a valid ID",
 			"error":   err,
 		})
 		return
 	}
 
-	event.ID = id
-	updatedEvent, err := event.Update()
+	userID := c.GetInt64("userID")
+	event, err := models.GetEventById(eventID)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "event with id " + c.Param("id") + " not found",
+		})
+		return
+	}
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to update Event with id " + c.Param("id"),
+			"message": "could not fetch the event",
+			"error":   err,
+		})
+		return
+	}
+
+	if event.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "not authorized",
+		})
+		return
+	}
+
+	var eventUpdates events.Event
+	if err := c.ShouldBindJSON(&eventUpdates); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "could not parse request data.",
+			"error":   err,
+		})
+		return
+	}
+
+
+	eventUpdates.ID = eventID
+	eventUpdates.UserID = userID
+	updatedEvent, err := eventUpdates.Update()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to update Event with id " + c.Param("id"),
 			"error":   err,
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Event with id " + c.Param("id") + " Updated Successfully",
+		"message": "event with id " + c.Param("id") + " updated Successfully",
 		"event":   updatedEvent,
 	})
 }
 
 func DeleteEvent(c *gin.Context) {
 	eventID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "valid event is required!",
 			"error":   err,
+		})
+		return
+	}
+
+	userID := c.GetInt64("userID")
+	event, err := models.GetEventById(eventID)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Event with id " + c.Param("id") + " not found",
+		})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not fetch the event",
+			"error":   err,
+		})
+		return
+	}
+
+	if event.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Not Authorized",
 		})
 		return
 	}
