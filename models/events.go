@@ -15,8 +15,6 @@ type Event struct {
 	UserID      int64     `json:"user_id"`
 }
 
-var Events []Event
-
 func (e *Event) Save() error {
 	query := `
 	INSERT INTO events(name, description, location, date_time, user_id)

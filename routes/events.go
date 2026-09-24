@@ -8,11 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sandro-samy/event-booking/models"
-	events "github.com/sandro-samy/event-booking/models"
 )
 
 func GetEvents(c *gin.Context) {
-	events, err := events.GetEvents()
+	events, err := models.GetEvents()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "could not fetch events.",
@@ -35,7 +34,7 @@ func GetEventByID(c *gin.Context) {
 	}
 
 	userID := c.GetInt64("userID")
-	event, err := events.GetEventByID(id)
+	event, err := models.GetEventByID(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -46,8 +45,8 @@ func GetEventByID(c *gin.Context) {
 	}
 
 	if event.UserID != userID {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "not authorized",
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden access",
 		})
 		return
 	}
@@ -58,7 +57,7 @@ func GetEventByID(c *gin.Context) {
 }
 
 func CreateEvent(c *gin.Context) {
-	var event events.Event
+	var event models.Event
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "could not parse request data.",
@@ -112,13 +111,13 @@ func UpdateEvent(c *gin.Context) {
 	}
 
 	if event.UserID != userID {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "not authorized",
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden access",
 		})
 		return
 	}
 
-	var eventUpdates events.Event
+	var eventUpdates models.Event
 	if err := c.ShouldBindJSON(&eventUpdates); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "could not parse request data.",
@@ -176,22 +175,22 @@ func DeleteEvent(c *gin.Context) {
 	}
 
 	if event.UserID != userID {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Not Authorized",
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden access",
 		})
 		return
 	}
 
-	err = events.Delete(eventID)
+	err = models.Delete(eventID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to delete Event with id " + c.Param("id"),
+			"message": "filed to delete eent with id " + c.Param("id"),
 			"error":   err,
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Event with id " + c.Param("id") + " Deleted Successfully",
+		"message": "event with id " + c.Param("id") + " deleted sccessfully",
 	})
 }
