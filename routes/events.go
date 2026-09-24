@@ -36,6 +36,13 @@ func GetEventByID(c *gin.Context) {
 	userID := c.GetInt64("userID")
 	event, err := models.GetEventByID(id)
 
+	if errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "event with id " + c.Param("id") + " not found",
+		})
+		return
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "fail to get event with id " + c.Param("id"),
