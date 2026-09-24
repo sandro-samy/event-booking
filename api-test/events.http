@@ -2,12 +2,14 @@
 
 # Run "Create event" first — the other requests reuse the id it returns.
 @eventId = 35
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3OTAzNDAwMTcsInVzZXJJRCI6MH0.dCQCVXmk7j6-YnfZONmL474_I5IWX-YBrNiMVvWTYLU
 # @eventId = {{createEvent.response.body.$.event.id}}
 
 ### Create event
 # @name createEvent
 POST {{baseUrl}}/events
 Content-Type: application/json
+Authorization: {{token}}
 
 {
   "name": "Sample Event",

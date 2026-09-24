@@ -3,26 +3,24 @@ package models
 import (
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/sandro-samy/event-booking/db"
 )
 
 type Event struct {
-	ID          string    `json:"id"`
+	ID          int64     `json:"id"`
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description" binding:"required"`
 	Location    string    `json:"location" binding:"required"`
 	DateTime    time.Time `json:"date_time" binding:"required"`
-	UserID      string    `json:"user_id"`
+	UserID      int64     `json:"user_id"`
 }
 
 var Events []Event
 
 func (e *Event) Save() error {
 	query := `
-	INSERT INTO events(id, name, description, location, date_time, user_id)
-	VALUES (?, ?, ?, ?, ?, ?)
+	INSERT INTO events(name, description, location, date_time, user_id)
+	VALUES (?, ?, ?, ?, ?)
 	`
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
@@ -31,9 +29,12 @@ func (e *Event) Save() error {
 
 	defer stmt.Close()
 
-	id := uuid.NewString()
+	result, err := stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID)
+	if err != nil {
+		return err
+	}
 
-	_, err = stmt.Exec(id, e.Name, e.Description, e.Location, e.DateTime, e.UserID)
+	id, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
@@ -63,7 +64,7 @@ func GetEvents() ([]Event, error) {
 	return events, rows.Err()
 }
 
-func GetEventById(id string) (*Event, error) {
+func GetEventById(id int64) (*Event, error) {
 	query := `SELECT * FROM events WHERE id = ?`
 	row := db.DB.QueryRow(query, id)
 
@@ -97,10 +98,10 @@ func (event *Event) Update() (*Event, error) {
 	return event, nil
 }
 
-func Delete(id string) error {
+func Delete(id int64) error {
 	query := `DELETE FROM events WHERE id = ?`
 
-	_, err := db.DB.Exec(query,id)
+	_, err := db.DB.Exec(query, id)
 	if err != nil {
 		return err
 	}

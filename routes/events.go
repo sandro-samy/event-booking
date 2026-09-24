@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	events "github.com/sandro-samy/event-booking/models"
@@ -12,7 +13,7 @@ func GetEvents(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Could not fetch events.",
-			"error": err,
+			"error":   err,
 		})
 		return
 	}
@@ -20,13 +21,23 @@ func GetEvents(c *gin.Context) {
 }
 
 func GetEventByID(c *gin.Context) {
-	event, err := events.GetEventById(c.Param("id"))
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "valid id is required",
+			"error":   err,
+		})
+		return
+	}
+
+	event, err := events.GetEventById(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "fail to get event with id " + c.Param("id"),
-			"error": err,
+			"error":   err,
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -35,21 +46,26 @@ func GetEventByID(c *gin.Context) {
 }
 
 func CreateEvent(c *gin.Context) {
+
 	var event events.Event
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Could not parse request data.",
-			"error": err,
+			"error":   err,
 		})
+		return
 	}
 
-	event.UserID = "1" // Replace with the actual user ID from the authenticated user
+	userID := c.GetInt64("userID")
+
+	event.UserID = userID // Replace with the actual user ID from the authenticated user
 
 	if err := event.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Could not create event.",
-			"error": err,
+			"error":   err,
 		})
+		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Event created.",
@@ -62,17 +78,28 @@ func UpdateEvent(c *gin.Context) {
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Could not parse request data.",
-			"error": err,
+			"error":   err,
 		})
+		return
 	}
-	event.ID = c.Param("id")
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Please provide a valid ID",
+			"error":   err,
+		})
+		return
+	}
+
+	event.ID = id
 	updatedEvent, err := event.Update()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to update Event with id " + c.Param("id"),
-			"error": err,
+			"error":   err,
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -82,12 +109,22 @@ func UpdateEvent(c *gin.Context) {
 }
 
 func DeleteEvent(c *gin.Context) {
-	err := events.Delete(c.Param("id"))
+	eventID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "valid event is required!",
+			"error":   err,
+		})
+		return
+	}
+
+	err = events.Delete(eventID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to delete Event with id " + c.Param("id"),
-			"error": err,
+			"error":   err,
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

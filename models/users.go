@@ -1,20 +1,20 @@
 package models
 
 import (
-	"github.com/google/uuid"
+	"errors"
 
-	"github.com/sandro-samy/event-booking/utils"
 	"github.com/sandro-samy/event-booking/db"
+	"github.com/sandro-samy/event-booking/utils"
 )
 
 type User struct {
-	ID       string `json:"id"`
+	ID       int64  `json:"id"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 func (user *User) Save() error {
-	query := `INSERT INTO users(id, email, password) VALUES (?, ?, ?)`
+	query := `INSERT INTO users(email, password) VALUES (?, ?)`
 
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
@@ -22,19 +22,38 @@ func (user *User) Save() error {
 	}
 
 	hashedPassword, err := utils.HashPassword(user.Password)
-	
+
+	result, err := stmt.Exec(user.Email, hashedPassword)
 	if err != nil {
 		return err
 	}
 
-	id := uuid.NewString()
-
-	_, err = stmt.Exec(id, user.Email, hashedPassword)
+	userId, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
 
-	user.ID = id
+	user.ID = userId
+
+	return nil
+}
+
+func (u *User) ValidateCredentials() error {
+	query := "SELECT id, password FROM users WHERE email = ?"
+	row := db.DB.QueryRow(query, u.Email)
+
+	var password string
+	err := row.Scan(&u.ID, &password)
+
+	if err != nil {
+		return errors.New("Credentials invalid")
+	}
+
+	isValid := utils.CheckMatchingPassword(password, u.Password)
+
+	if !isValid {
+		return errors.New("Credentials invalid")
+	}
 
 	return nil
 }
