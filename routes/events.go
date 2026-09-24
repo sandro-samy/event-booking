@@ -131,7 +131,6 @@ func UpdateEvent(c *gin.Context) {
 		return
 	}
 
-
 	eventUpdates.ID = eventID
 	updatedEvent, err := eventUpdates.Update()
 
@@ -151,7 +150,7 @@ func UpdateEvent(c *gin.Context) {
 
 func DeleteEvent(c *gin.Context) {
 	eventID, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "valid event is required!",

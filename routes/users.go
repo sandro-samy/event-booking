@@ -60,7 +60,7 @@ func Login(c *gin.Context) {
 			"message": "valid email and password are required",
 			"error":   err,
 		})
-		
+
 		return
 	}
 

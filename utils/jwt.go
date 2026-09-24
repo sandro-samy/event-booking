@@ -44,7 +44,7 @@ func VerifyToken(token string) (int64, error) {
 	}
 
 	if !parsedToken.Valid {
-		return  0, errors.New("Invalid token!")
+		return 0, errors.New("Invalid token!")
 	}
 
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
@@ -55,7 +55,7 @@ func VerifyToken(token string) (int64, error) {
 
 	v, ok := claims["userID"].(float64)
 	if !ok {
-		return 0, errors.New("missing user id") 
+		return 0, errors.New("missing user id")
 	}
 
 	// email := claims["email"].(string)
