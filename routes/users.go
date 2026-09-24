@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sandro-samy/event-booking/models"
@@ -22,6 +23,13 @@ func Register(c *gin.Context) {
 	}
 
 	if err := newUser.Save(); err != nil {
+		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
+			c.JSON(http.StatusConflict, gin.H{
+				"message": "email already registered",
+			})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Something Went Wrong",
 			"error":   err,

@@ -99,11 +99,25 @@ func UpdateEvent(c *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEventByID(eventID)
+	event, err := models.GetEventByID(eventID)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "event with id " + c.Param("id") + " not found",
+		})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "could not fetch the event",
+		})
+		return
+	}
+
+	if event.UserID != c.GetInt64("userID") {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden access",
 		})
 		return
 	}
@@ -146,11 +160,25 @@ func DeleteEvent(c *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEventByID(eventID)
+	event, err := models.GetEventByID(eventID)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "Event with id " + c.Param("id") + " not found",
+		})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "could not fetch the event",
+		})
+		return
+	}
+
+	if event.UserID != c.GetInt64("userID") {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden access",
 		})
 		return
 	}
