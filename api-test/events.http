@@ -9,7 +9,7 @@
 # @name createEvent
 POST {{baseUrl}}/events
 Content-Type: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "name": "Sample Event",

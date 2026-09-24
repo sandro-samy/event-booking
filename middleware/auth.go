@@ -8,9 +8,9 @@ import (
 )
 
 func Auth(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
+	token, ok := utils.BearerToken(c.GetHeader("Authorization"))
 
-	if token == "" {
+	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Not Authorized",
 		})
