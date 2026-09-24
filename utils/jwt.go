@@ -40,7 +40,7 @@ func VerifyToken(token string) (int64, error) {
 	})
 
 	if err != nil {
-		return 0, errors.New("Cloud not parse token.")
+		return 0, errors.New("cloud not parse token.")
 	}
 
 	if !parsedToken.Valid {

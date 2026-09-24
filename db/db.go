@@ -14,7 +14,7 @@ func InitDB() *sql.DB {
 	DB, err = sql.Open("sqlite", "api.db")
 
 	if err != nil {
-		panic("Cloud not connect to database")
+		panic("cloud not connect to database")
 	}
 
 	DB.SetMaxOpenConns(10)
