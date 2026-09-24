@@ -64,7 +64,7 @@ func GetEvents() ([]Event, error) {
 	return events, rows.Err()
 }
 
-func GetEventById(id int64) (*Event, error) {
+func GetEventByID(id int64) (*Event, error) {
 	query := `SELECT * FROM events WHERE id = ?`
 	row := db.DB.QueryRow(query, id)
 

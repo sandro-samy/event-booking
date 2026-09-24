@@ -35,7 +35,7 @@ func GetEventByID(c *gin.Context) {
 	}
 
 	userID := c.GetInt64("userID")
-	event, err := events.GetEventById(id)
+	event, err := events.GetEventByID(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -94,7 +94,7 @@ func UpdateEvent(c *gin.Context) {
 	}
 
 	userID := c.GetInt64("userID")
-	event, err := models.GetEventById(eventID)
+	event, err := models.GetEventByID(eventID)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -158,7 +158,7 @@ func DeleteEvent(c *gin.Context) {
 	}
 
 	userID := c.GetInt64("userID")
-	event, err := models.GetEventById(eventID)
+	event, err := models.GetEventByID(eventID)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, gin.H{
