@@ -18,12 +18,17 @@ func (user *User) Save() error {
 
 	stmt, err := db.DB.Prepare(query)
 
-	defer stmt.Close()
 	if err != nil {
 		return err
 	}
 
+	defer stmt.Close()
+
 	hashedPassword, err := utils.HashPassword(user.Password)
+
+	if err != nil {
+		return err
+	}
 
 
 	result, err := stmt.Exec(user.Email, hashedPassword)

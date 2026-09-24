@@ -92,27 +92,11 @@ func UpdateEvent(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetInt64("userID")
-	event, err := models.GetEventByID(eventID)
+	_, err = models.GetEventByID(eventID)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "event with id " + c.Param("id") + " not found",
-		})
-		return
-	}
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "could not fetch the event",
-			"error":   err,
-		})
-		return
-	}
-
-	if event.UserID != userID {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "forbidden access",
 		})
 		return
 	}
@@ -128,7 +112,6 @@ func UpdateEvent(c *gin.Context) {
 
 
 	eventUpdates.ID = eventID
-	eventUpdates.UserID = userID
 	updatedEvent, err := eventUpdates.Update()
 
 	if err != nil {
@@ -156,8 +139,7 @@ func DeleteEvent(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetInt64("userID")
-	event, err := models.GetEventByID(eventID)
+	_, err = models.GetEventByID(eventID)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -166,31 +148,16 @@ func DeleteEvent(c *gin.Context) {
 		return
 	}
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Could not fetch the event",
-			"error":   err,
-		})
-		return
-	}
-
-	if event.UserID != userID {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "forbidden access",
-		})
-		return
-	}
-
 	err = models.Delete(eventID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "filed to delete eent with id " + c.Param("id"),
+			"message": "failed to delete event with id " + c.Param("id"),
 			"error":   err,
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "event with id " + c.Param("id") + " deleted sccessfully",
+		"message": "event with id " + c.Param("id") + " deleted successfully",
 	})
 }
