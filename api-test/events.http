@@ -1,8 +1,8 @@
 @baseUrl = http://localhost:8080
 
 # Run "Create event" first — the other requests reuse the id it returns.
-@eventId = 35
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3OTAzNDAwMTcsInVzZXJJRCI6MH0.dCQCVXmk7j6-YnfZONmL474_I5IWX-YBrNiMVvWTYLU
+@eventId = 36
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3OTA0MzMzODYsInVzZXJJRCI6MX0.I5r_TdIoYs31DLoMVeQiMKEuJdo-90KC4vJQZ36G_ko
 # @eventId = {{createEvent.response.body.$.event.id}}
 
 ### Create event
@@ -23,10 +23,12 @@ GET {{baseUrl}}/events
 
 ### Get event by id
 GET {{baseUrl}}/events/{{eventId}}
+Authorization: Bearer {{token}}
 
 ### Update event
 PUT {{baseUrl}}/events/{{eventId}}
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "Updated 2 Event",
@@ -37,3 +39,4 @@ Content-Type: application/json
 
 ### Delete event
 DELETE {{baseUrl}}/events/{{eventId}}
+Authorization: Bearer {{token}}
