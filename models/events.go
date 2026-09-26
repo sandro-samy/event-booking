@@ -50,7 +50,7 @@ func GetEvents(userID int64) ([]Event, error) {
 	}
 	defer rows.Close()
 
-	var events []Event
+	events := []Event{}
 	for rows.Next() {
 		var event Event
 		if err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.UserID); err != nil {

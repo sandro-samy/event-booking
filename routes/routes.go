@@ -6,12 +6,11 @@ import (
 )
 
 func RegisterRoutes(server *gin.Engine) {
-	server.GET("/events", GetEvents)
-
 	// Auth routes
 	authGroup := server.Group("/events")
 	authGroup.Use(middleware.Auth)
-	authGroup.GET(":id", GetEventByID)
+	authGroup.GET("", GetEvents)
+	authGroup.GET("/:id", GetEventByID)
 	authGroup.POST("", CreateEvent)
 	authGroup.PUT("/:id", UpdateEvent)
 	authGroup.DELETE("/:id", DeleteEvent)

@@ -20,6 +20,7 @@ Authorization: Bearer {{token}}
 
 ### Get all events
 GET {{baseUrl}}/events
+Authorization: Bearer {{token}}
 
 ### Get event by id
 GET {{baseUrl}}/events/{{eventId}}
