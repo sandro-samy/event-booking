@@ -11,7 +11,9 @@ import (
 )
 
 func GetEvents(c *gin.Context) {
-	events, err := models.GetEvents()
+	userID := c.GetInt64("userID")
+	events, err := models.GetEvents(userID)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "could not fetch events.",
