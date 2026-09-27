@@ -6,6 +6,8 @@ import (
 )
 
 func RegisterRoutes(server *gin.Engine) {
+	server.Use(middleware.CORS)
+
 	// Auth routes
 	authGroup := server.Group("/events")
 	authGroup.Use(middleware.Auth)
