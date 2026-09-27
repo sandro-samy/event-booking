@@ -10,6 +10,9 @@ Requires Go 1.27+.
 
    ```
    JWT_SECRET=some-long-random-string
+   # Origin allowed to call the API. Leave unset for local dev — the API then
+   # reflects back whichever origin the browser sends. Set this in production.
+   # CORS_ORIGIN=https://your-frontend.example.com
    ```
 
 2. Run the server:
