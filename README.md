@@ -20,8 +20,6 @@ Requires Go 1.27+.
 
 The API listens on `http://localhost:8080`. The SQLite database (`api.db`) is created automatically on first run.
 
-To run it with Docker instead, see [DOCKER.md](DOCKER.md).
-
 ## Endpoints
 
 | Method | Path             | Auth | Description                |
