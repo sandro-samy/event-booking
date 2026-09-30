@@ -16,6 +16,7 @@ func CORS(c *gin.Context) {
 	if origin == "" {
 		origin = c.GetHeader("Origin")
 	}
+	
 	if origin == "" {
 		c.Next()
 		return
